@@ -1,12 +1,10 @@
 name: Build TaskOrbit APK
-
 on:
+  workflow_dispatch:
   push:
-    branches: [ "**" ]
-
+    branches: [ "main" ]
 permissions:
   contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,14 +14,19 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
-      - run: gradle assembleDebug
-      - run: cp app/build/outputs/apk/debug/app-debug.apk TaskOrbit.apk
+      - name: Build
+        run: gradle assembleDebug --stacktrace
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk TaskOrbit.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TaskOrbit-APK
+          path: TaskOrbit.apk
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: v4.0
-          name: "TaskOrbit (Offline Vault)"
+          tag_name: apk-release-${{ github.run_number }}
+          name: "TaskOrbit Build #${{ github.run_number }}"
           files: TaskOrbit.apk
