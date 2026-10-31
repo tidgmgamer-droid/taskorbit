@@ -43,7 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.util.*
@@ -96,7 +96,7 @@ abstract class EncryptedVaultDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 System.loadLibrary("sqlcipher")
                 val passphrase = getOrCreateHardwareBackedKey(context)
-                val factory = SupportFactory(passphrase)
+                val factory = SupportOpenHelperFactory(passphrase)
                 Room.databaseBuilder(
                     context.applicationContext,
                     EncryptedVaultDatabase::class.java,
